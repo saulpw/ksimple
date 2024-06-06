@@ -31,10 +31,10 @@ typedef unsigned long u;                                 //!< although u is form
 #define P(b,e) if(b)return _(e);                         //!< predicate aka panic: if b evaluates to true, return result of e.
 
 #define _(e) ({e;})                                      //!< isolate expression e in its own lexical scope and clamp it with ;
-                                                         //!< note the outer parens, which is a very powerful c trick: they turn _(e) into a so called
+                                                         //!< note the outer parens, which is a very powerful C trick: they turn _(e) into a so called
                                                          //!< r-value, which basically means we can do x=_(e) for as long as e evaluates to or returns
                                                          //!< at least anything at all, i.e. not void. this macro is fundamental to k/simple implementation.
-                                                         //!< l-/r-values are fundamental to c, good mnemonic is (l)eft/(r)ight although not 100% precise.
+                                                         //!< l-/r-values are fundamental to C, good mnemonic is (l)eft/(r)ight although not 100% precise.
 
 //!functions
 #define _u(f,e,x...) u f(x){R(u)_(e);}                   //!< generic function definition template: f name, x args, e body, all functions return some u
@@ -97,7 +97,7 @@ static const u Q=128;                                    //!< magic numer for er
                                                          //!< for simplicity, we keep u as ull for now.
 
 static u WS=0;                                           //!< WS workspace size (current number of bytes allocated).
-static u U[26];                                          //!< global namespace: array of values of variables abc..xyz. in c, global arrays are initalized with zeroes.
+static u U[26];                                          //!< global namespace: array of values of variables abc..xyz. in C, global arrays are initalized with zeroes.
 
 #define BA "k/simple (c) 2024 atw/kpc\n"                 //!< startup banner
 

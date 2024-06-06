@@ -22,7 +22,7 @@ f(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)     //!< (s)tring from (i)nteger
 f(wi,w(si(x)))                                      //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
 f(W,Q(x)$(ax,wi(x))i(nx,wi(xi))w(10))               //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
                                                     //!< separated by space. terminate output by a newline aka ascii 10.
-G(err,w(f);w(58);wi(x);w(y);w(10);Q)                //!< (err)or: print name of the c (f)unction where error occured, line number and error msg, return Q.
+G(err,w(f);w(58);wi(x);w(y);w(10);Q)                //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return Q.
 
 //!malloc
 f(a,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))    //!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
@@ -100,7 +100,7 @@ op(Eql,==)op(Not,!=)op(And,&)op(Or,|)op(Prd,*)                //!< et voila, we 
 
 //!verb dispatch
 char*V=" +-!#,@=~&|*";                                        //!< V is an array of tokens of all supported k verbs. 0'th item (space) stands for "not a verb".
-u(*f[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo},  //!< f[] is an array of pointers to c functions which implement monadic versions of k verbs listed in V.
+u(*f[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo},  //!< f[] is an array of pointers to C functions which implement monadic versions of k verbs listed in V.
  (*F[])(u,u)={0,Add,Sub,Mod,Tak,Cat,At,Eql,Not,And,Or, Prd};  //!< F[] is ditto for dyadic versions of verbs listed in V.
 // V:           +   -   !   #   ,   @  =   ~   &   |   *
 
@@ -160,6 +160,6 @@ int main(int c,char**v){u r=2==c;                   //!< entry point: r=0 is rep
          x(e(l),                                    //!< else, evaluate buffer b[] and put result into x, then:
            58==l[1]?x                               //!<   if b starts with a global assignment e.g. a:7, suppress output and cycle repl.
                    :_x(W(x)));}                     //!<   otherwise, pretty print evaluation result to stdout, then cycle repl.
-  R free(l),fclose(t),0;}                           //!< in c, return value of main() is the exit code of the process, 0 is success.
+  R free(l),fclose(t),0;}                           //!< in C, return value of main() is the exit code of the process, 0 is success.
 
 //:~
