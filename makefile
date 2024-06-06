@@ -1,6 +1,8 @@
-O=-O0 -g -Werror -Wno-pointer-sign
-all:
-	@cc $O -oa a.c
+CFLAGS=-O0 -g -Werror -Wno-pointer-sign
+CC=cc
 
-t:
-	@tcc $O -oa a.c
+test: ksimple
+	./ksimple t.k
+
+ksimple: a.c a.h
+	${CC} ${CFLAGS} -o $@ $<
