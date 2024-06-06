@@ -131,16 +131,16 @@ defstr(rl,l=l?:malloc(mx);                          //!< (r)ead(l)ine: reset mx 
      r=r<mx?l[r-('\n'==l[r-1])]=0:Q))               //!< if reached end of file, return Q, otherwise clamp trailing \n and return 0.
 
 //!eval
-defstr(e,                                           //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:
+defstr(eval,                                        //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:
    u8*t=s;u8 i=*t++;                                //!< t is a temporary pointer to s. read the current token into i and advance temporary tape pointer.
    !*t?x(n(i),Qp()x)                                //!< if next token after i is null (ie end of tape): final token must be a noun, so return it, otherwise:
       :v(i)                                         //!< in case if i is a valid verb:
-           ?d(*t)?x(e(t+1),Q(x)                     //!<   if the verb is followed by an adverb, recursively evaluate token after adverb into x. bail out on error.
+           ?d(*t)?x(eval(t+1),Q(x)                  //!<   if the verb is followed by an adverb, recursively evaluate token after adverb into x. bail out on error.
                     D[d(*t)](v(i),x))               //!<     dispatch an adverb: first argument is the index of the verb, second is the operand.
-           :x(e(t),Q(x)                             //!<   otherwise, recursively evaluate next token after verb and put resulting noun into x. bail out on error.
+           :x(eval(t),Q(x)                          //!<   otherwise, recursively evaluate next token after verb and put resulting noun into x. bail out on error.
               f[v(i)](x))                           //!<   apply monadic verb i to the operand x and return the result, which can be either nounmn or error.
            :y(                                      //!< in case if i is not a verb, it must be a valid noun, and the next token after a noun should be a verb,
-              e(t+1),Q(y)                           //!<   recursively evaluate next token to the right of the verb and put result into y. bail out on error.
+              eval(t+1),Q(y)                        //!<   recursively evaluate next token to the right of the verb and put result into y. bail out on error.
               ':'==*t                               //!<   special case: if y is preceded by a colon instead of a verb, it is an inline assignment (eg 1+a:1),
                     ?x(g(i),Qp()ag(i-'a',y))        //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in U[26], and return it.
                     :x(n(i),Qp()                    //!<   x is a noun to the left of the verb. throw parse error if it is invalid.
@@ -157,7 +157,7 @@ int main(int argc,char**argv){u batch=2==argc;      //!< entry point: batch=0 is
       $('w'==l[1],wu(WS))                           //!<   if buffer is a \w, print workspace usage and cycle repl.
        $('v'==l[1],wg()))                           //!<   if buffer is a \v, print globals and their refcounts (useful for debug).
         $('/'==*l,continue)                         //!< if buffer starts with /, treat the rest of the line as comment and cycle repl.
-         x(e(l),                                    //!< else, evaluate buffer b[] and put result into x, then:
+         x(eval(l),                                 //!< else, evaluate buffer b[] and put result into x, then:
            ':'==l[1]?x                              //!<   if b starts with a global assignment e.g. a:7, suppress output and cycle repl.
                    :_x(W(x)));}                     //!<   otherwise, pretty print evaluation result to stdout, then cycle repl.
   R free(l),fclose(t),0;}                           //!< in C, return value of main() is the exit code of the process, 0 is success.
