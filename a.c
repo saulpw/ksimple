@@ -120,9 +120,9 @@ u(*adverbs2[])(u,u)={0,Ovr,Scn};                    //!< adverbs[]/adverbs2[] is
 //!globals, verbs, nouns, adverbs
 def1(g,x>='a'&&x<='z')                              //!< is x a valid (g)lobal variable identifier?
 def2(ag,y(U[f],!ay?unalloc(y):x;incref(U[f]=x)))    //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
-def1(v,(strchr(verbs,x)?:verbs)-verbs)              //!< is x a valid (v)erb from verbs? if so, return its index, otherwise return 0.
+def1(verb,(strchr(verbs,x)?:verbs)-verbs)           //!< is x a valid verb from verbs? if so, return its index, otherwise return 0.
                                                     //!< \note rarely seen ternary form x?:y, which is just a shortcut for x?x:y in c.
-def1(d,(strchr(adverbs,x)?:adverbs)-adverbs)        //!< same as v() for a(d)verbs.
+def1(adverb,(strchr(adverbs,x)?:adverbs)-adverbs)   //!< same as verb() for adverbs.
 def1(n,10>x-'0'                                     //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
            ?x-'0'                                   //!< if x is a digit, e.g. '7', return its decimal value.
            :g(x)?incref(U[x-'a'])                   //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
@@ -140,17 +140,17 @@ defstr(readln,l=l?:malloc(mx);                      //!< (r)ead(l)ine: reset mx 
 defstr(eval,                                        //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:
    u8*t=s;u8 i=*t++;                                //!< t is a temporary pointer to s. read the current token into i and advance temporary tape pointer.
    !*t?x(n(i),Qp()x)                                //!< if next token after i is null (ie end of tape): final token must be a noun, so return it, otherwise:
-      :v(i)                                         //!< in case if i is a valid verb:
-           ?d(*t)?x(eval(t+1),Q(x)                  //!<   if the verb is followed by an adverb, recursively evaluate token after adverb into x. bail out on error.
-                    adverbs2[d(*t)](v(i),x))        //!<     dispatch an adverb: first argument is the index of the verb, second is the operand.
+      :verb(i)                                      //!< in case if i is a valid verb:
+           ?adverb(*t)?x(eval(t+1),Q(x)             //!<   if the verb is followed by an adverb, recursively evaluate token after adverb into x. bail out on error.
+                    adverbs2[adverb(*t)](verb(i),x))//!<     dispatch an adverb: first argument is the index of the verb, second is the operand.
            :x(eval(t),Q(x)                          //!<   otherwise, recursively evaluate next token after verb and put resulting noun into x. bail out on error.
-              verbs1[v(i)](x))                      //!<   apply monadic verb i to the operand x and return the result, which can be either nounmn or error.
+              verbs1[verb(i)](x))                   //!<   apply monadic verb i to the operand x and return the result, which can be either nounmn or error.
            :y(                                      //!< in case if i is not a verb, it must be a valid noun, and the next token after a noun should be a verb,
               eval(t+1),Q(y)                        //!<   recursively evaluate next token to the right of the verb and put result into y. bail out on error.
               ':'==*t                               //!<   special case: if y is preceded by a colon instead of a verb, it is an inline assignment (eg 1+a:1),
                     ?x(g(i),Qp()ag(i-'a',y))        //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in U[26], and return it.
                     :x(n(i),Qp()                    //!<   x is a noun to the left of the verb. throw parse error if it is invalid.
-                         u8 f=v(*t);Qd(!f)          //!<   f is the index of the verb to the left of noun y. if it's not a valid verb, throw domain error.
+                         u8 f=verb(*t);Qd(!f)       //!<   f is the index of the verb to the left of noun y. if it's not a valid verb, throw domain error.
                          verbs2[f](x,y))))          //!< apply dyadic verb f to nouns x and y (e.g. 2+3) and return result (noun or error).
 
 //!repl/batch
