@@ -37,7 +37,8 @@ f(_r,ax?x                                           //!< decrement refcount: if 
           :unalloc(x))                              //!<   if refcount is 0, release memory occupied by x and return 0.
 
 //!monadic verbs
-f(foo,_r(x);Qz(1);Q)F(Foo,_r(x);Qz(1);Q)            //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
+f(foo,_r(x);Qz(1);Q)
+F(Foo,_r(x);Qz(1);Q)                                //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
 
 f(sub,ax?(u8)-x:_x(NEW(nx,-xi)))                    //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
                                                     //!< if x is a vector, return a new vector same as x only with sign of its every element flipped.
@@ -100,8 +101,8 @@ op(Eql,==)op(Not,!=)op(And,&)op(Or,|)op(Prd,*)                //!< et voila, we 
 
 //!verb dispatch
 char*V=" +-!#,@=~&|*";                                        //!< V is an array of tokens of all supported k verbs. 0'th item (space) stands for "not a verb".
-u(*f[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo},  //!< f[] is an array of pointers to C functions which implement monadic versions of k verbs listed in V.
- (*F[])(u,u)={0,Add,Sub,Mod,Tak,Cat,At,Eql,Not,And,Or, Prd};  //!< F[] is ditto for dyadic versions of verbs listed in V.
+u(*f[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo};  //!< f[] is an array of pointers to C functions which implement monadic versions of k verbs listed in V.
+u(*F[])(u,u)={0,Add,Sub,Mod,Tak,Cat,At,Eql,Not,And,Or, Prd};  //!< F[] is ditto for dyadic versions of verbs listed in V.
 // V:           +   -   !   #   ,   @  =   ~   &   |   *
 
 //!adverbs
@@ -109,7 +110,8 @@ F(Ovr,ax?x:_x(r(*sx,FOR(nx-1,r=F[f](r,sx[i+1])))))                       //!< ad
 F(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;FOR(nx-1,sr[i+1]=F[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
 
 //!adverb dispatch
-char*AV=" /\\";u(*D[])(u,u)={0,Ovr,Scn};            //!< AV[]/D[] is the same as V[]/F[], only for adverbs.
+char*AV=" /\\";
+u(*D[])(u,u)={0,Ovr,Scn};                           //!< AV[]/D[] is the same as V[]/F[], only for adverbs.
 
 //!globals, verbs, nouns, adverbs
 f(g,x>='a'&&x<='z')                                 //!< is x a valid (g)lobal variable identifier?
