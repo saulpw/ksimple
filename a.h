@@ -27,7 +27,7 @@ typedef unsigned long u;                                 //!< although u is form
 #define R return                                         //!< unclutter
 #define O printf                                         //!< classic atw debug
 #define $(a,b) if(a)b;else                               //!< handy shorthand for if-then-else. beware of dangling else!
-#define i(n,e) {int $n=n;int i=0;for(;i<$n;++i){e;}}     //!< (i)terate: execute (e)xpression n times, loop counter i is accessible from e
+#define FOR(n,e) {int $n=n;int i=0;for(;i<$n;++i){e;}}   //!< (i)terate: execute (e)xpression n times, loop counter i is accessible from e
 #define P(b,e) if(b)return _(e);                         //!< predicate aka panic: if b evaluates to true, return result of e.
 
 #define _(e) ({e;})                                      //!< isolate expression e in its own lexical scope and clamp it with ;
@@ -80,7 +80,7 @@ static const u Q=128;                                    //!< magic numer for er
 #define Ql()    Qe("length")                             //!< length error
 
 //!all of the above coming together:
-#define N(n,e) r(alloc(n),i(n,ri=e))                     //!< this macro is the foundation of k/simple and is ubiquitous in a.c. it reads:
+#define N(n,e) r(alloc(n),FOR(n,ri=e))                   //!< this macro is the foundation of k/simple and is ubiquitous in a.c. it reads:
                                                          //!< (a)llocate a (N)ew vector r of le(n)gth n, then apply some (e)xpression to it, then return r.
                                                          //!< here are few basic examples to illustrate what "apply" means:
 

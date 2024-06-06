@@ -13,14 +13,14 @@
 
 //!debug
 f(wu,O("%lu\n",x))                                  //!< (w)rite (u)ll: print unsigned long long (e.g. total memory allocation), useful for refcount debugging.
-void wg(){i(26,x(U[i],$(!ax,O("%c[%d] %d\n",i+'a',nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
+void wg(){FOR(26,x(U[i],$(!ax,O("%c[%d] %d\n",i+'a',nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
 
 //!printing facilities
 f(w,write(1,ax?(u8*)&x:sx,ax?1:strlen(sx)))         //!< (w)rite to stdout: if x is an atom, print its decimal value, otherwise print x as ascii string.
 static u8 pb[12];                                   //!< temporary string (b)uffer for formatting vector items. it's ok to declare it globally, since we only have one thread.
 f(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)     //!< (s)tring from (i)nteger: format a given atom x as decimal in range (-128..127) into buffer b using sprintf(3).
 f(wi,w(si(x)))                                      //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
-f(W,Q(x)$(ax,wi(x))i(nx,wi(xi))w(10))               //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
+f(W,Q(x)$(ax,wi(x))FOR(nx,wi(xi))w(10))             //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
                                                     //!< separated by space. terminate output by a newline aka ascii 10.
 G(err,w(f);w(58);wi(x);w(y);w(10);Q)                //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return Q.
 
@@ -105,8 +105,8 @@ u(*f[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo},  //!< f[] is an arr
 // V:           +   -   !   #   ,   @  =   ~   &   |   *
 
 //!adverbs
-F(Ovr,ax?x:_x(r(*sx,i(nx-1,r=F[f](r,sx[i+1])))))                       //!< adverb over: recursively fold all elements of vector x using dyadic verb f going left to right.
-F(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;i(nx-1,sr[i+1]=F[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
+F(Ovr,ax?x:_x(r(*sx,FOR(nx-1,r=F[f](r,sx[i+1])))))                       //!< adverb over: recursively fold all elements of vector x using dyadic verb f going left to right.
+F(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;FOR(nx-1,sr[i+1]=F[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
 
 //!adverb dispatch
 char*AV=" /\\";u(*D[])(u,u)={0,Ovr,Scn};            //!< AV[]/D[] is the same as V[]/F[], only for adverbs.
