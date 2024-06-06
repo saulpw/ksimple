@@ -100,25 +100,25 @@ f(at,At(x,0))                                       //!< monadic @x is simply (f
 op(Eql,==)op(Not,!=)op(And,&)op(Or,|)op(Prd,*)                //!< et voila, we have definitions of dyadic equal, not equal, and, or and product for free.
 
 //!verb dispatch
-char*V=" +-!#,@=~&|*";                                        //!< V is an array of tokens of all supported k verbs. 0'th item (space) stands for "not a verb".
-u(*f[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo};  //!< f[] is an array of pointers to C functions which implement monadic versions of k verbs listed in V.
-u(*F[])(u,u)={0,Add,Sub,Mod,Tak,Cat,At,Eql,Not,And,Or, Prd};  //!< F[] is ditto for dyadic versions of verbs listed in V.
-// V:           +   -   !   #   ,   @  =   ~   &   |   *
+char*verbs=" +-!#,@=~&|*";                                        //!< verbs is an array of tokens of all supported k verbs. 0'th item (space) stands for "not a verb".
+u(*verbs1[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo};  //!< f[] is an array of pointers to C functions which implement monadic versions of k verbs listed in verbs.
+u(*verbs2[])(u,u)={0,Add,Sub,Mod,Tak,Cat,At,Eql,Not,And,Or, Prd};  //!< F[] is ditto for dyadic versions of verbs listed in verbs.
+// verbs:             +   -   !   #   ,   @  =   ~   &   |   *
 
 //!adverbs
-F(Ovr,ax?x:_x(r(*sx,FOR(nx-1,r=F[f](r,sx[i+1])))))                       //!< adverb over: recursively fold all elements of vector x using dyadic verb f going left to right.
-F(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;FOR(nx-1,sr[i+1]=F[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
+F(Ovr,ax?x:_x(r(*sx,FOR(nx-1,r=verbs2[f](r,sx[i+1])))))                       //!< adverb over: recursively fold all elements of vector x using dyadic verb f going left to right.
+F(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;FOR(nx-1,sr[i+1]=verbs2[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
 
 //!adverb dispatch
-char*AV=" /\\";
-u(*D[])(u,u)={0,Ovr,Scn};                           //!< AV[]/D[] is the same as V[]/F[], only for adverbs.
+char*adverbs=" /\\";
+u(*adverbs2[])(u,u)={0,Ovr,Scn};                    //!< adverbs[]/adverbs2[] is the same as verbs[]/verbs2[], only for adverbs.
 
 //!globals, verbs, nouns, adverbs
 f(g,x>='a'&&x<='z')                                 //!< is x a valid (g)lobal variable identifier?
 F(ag,y(U[f],!ay?unalloc(y):x;incref(U[f]=x)))       //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
-f(v,(strchr(V,x)?:V)-V)                             //!< is x a valid (v)erb from V? if so, return its index, otherwise return 0.
+f(v,(strchr(verbs,x)?:verbs)-verbs)                 //!< is x a valid (v)erb from verbs? if so, return its index, otherwise return 0.
                                                     //!< \note rarely seen ternary form x?:y, which is just a shortcut for x?x:y in c.
-f(d,(strchr(AV,x)?:AV)-AV)                          //!< same as v() for a(d)verbs.
+f(d,(strchr(adverbs,x)?:adverbs)-adverbs)           //!< same as v() for a(d)verbs.
 f(n,10>x-'0'                                        //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
            ?x-'0'                                   //!< if x is a digit, e.g. '7', return its decimal value.
            :g(x)?incref(U[x-'a'])                   //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
@@ -138,16 +138,16 @@ defstr(eval,                                        //!< (e)val: recursively eva
    !*t?x(n(i),Qp()x)                                //!< if next token after i is null (ie end of tape): final token must be a noun, so return it, otherwise:
       :v(i)                                         //!< in case if i is a valid verb:
            ?d(*t)?x(eval(t+1),Q(x)                  //!<   if the verb is followed by an adverb, recursively evaluate token after adverb into x. bail out on error.
-                    D[d(*t)](v(i),x))               //!<     dispatch an adverb: first argument is the index of the verb, second is the operand.
+                    adverbs2[d(*t)](v(i),x))        //!<     dispatch an adverb: first argument is the index of the verb, second is the operand.
            :x(eval(t),Q(x)                          //!<   otherwise, recursively evaluate next token after verb and put resulting noun into x. bail out on error.
-              f[v(i)](x))                           //!<   apply monadic verb i to the operand x and return the result, which can be either nounmn or error.
+              verbs1[v(i)](x))                      //!<   apply monadic verb i to the operand x and return the result, which can be either nounmn or error.
            :y(                                      //!< in case if i is not a verb, it must be a valid noun, and the next token after a noun should be a verb,
               eval(t+1),Q(y)                        //!<   recursively evaluate next token to the right of the verb and put result into y. bail out on error.
               ':'==*t                               //!<   special case: if y is preceded by a colon instead of a verb, it is an inline assignment (eg 1+a:1),
                     ?x(g(i),Qp()ag(i-'a',y))        //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in U[26], and return it.
                     :x(n(i),Qp()                    //!<   x is a noun to the left of the verb. throw parse error if it is invalid.
                          u8 f=v(*t);Qd(!f)          //!<   f is the index of the verb to the left of noun y. if it's not a valid verb, throw domain error.
-                         F[f](x,y))))               //!< apply dyadic verb f to nouns x and y (e.g. 2+3) and return result (noun or error).
+                         verbs2[f](x,y))))          //!< apply dyadic verb f to nouns x and y (e.g. 2+3) and return result (noun or error).
 
 //!repl/batch
 int main(int argc,char**argv){u batch=2==argc;      //!< entry point: batch=0 is repl mode, batch=1 is batch mode i.e. when a filename is passed.
