@@ -96,8 +96,12 @@ def1(at,At(x,0))                                    //!< monadic @x is simply (f
 //!     5.2 (i'th element of x) OP (i'th element of f)
 //!  6. finally, attempt to release memory of f and x, and return r.
 
-#define op(fn,OP) def2(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(NEW(nx,f OP xi)):_f(_x(nx-nf?Ql():NEW(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
-op(Eql,==)op(Not,!=)op(And,&)op(Or,|)op(Prd,*)                //!< et voila, we have definitions of dyadic equal, not equal, and, or and product for free.
+#define defop(fn,OP) def2(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(NEW(nx,f OP xi)):_f(_x(nx-nf?Ql():NEW(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
+defop(Eql,==)
+defop(Not,!=)
+defop(And,&)
+defop(Or,|)
+defop(Prd,*)                //!< et voila, we have definitions of dyadic equal, not equal, and, or and product for free.
 
 //!verb dispatch
 char*verbs=" +-!#,@=~&|*";                                        //!< verbs is an array of tokens of all supported k verbs. 0'th item (space) stands for "not a verb".
