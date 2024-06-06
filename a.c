@@ -12,49 +12,49 @@
                                                     //! cc -w ..       minimal build instructions (which are much more stringent in provided makefile)
 
 //!debug
-f(wu,printf("%lu\n",x))                             //!< (w)rite (u)ll: print unsigned long long (e.g. total memory allocation), useful for refcount debugging.
+def1(wu,printf("%lu\n",x))                          //!< (w)rite (u)ll: print unsigned long long (e.g. total memory allocation), useful for refcount debugging.
 void wg(){FOR(26,x(U[i],$(!ax,printf("%c[%d] %d\n",i+'a',nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
 
 //!printing facilities
-f(w,write(1,ax?(u8*)&x:sx,ax?1:strlen(sx)))         //!< (w)rite to stdout: if x is an atom, print its decimal value, otherwise print x as ascii string.
+def1(w,write(1,ax?(u8*)&x:sx,ax?1:strlen(sx)))      //!< (w)rite to stdout: if x is an atom, print its decimal value, otherwise print x as ascii string.
 static u8 pb[12];                                   //!< temporary string (b)uffer for formatting vector items. it's ok to declare it globally, since we only have one thread.
-f(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)     //!< (s)tring from (i)nteger: format a given atom x as decimal in range (-128..127) into buffer b using sprintf(3).
-f(wi,w(si(x)))                                      //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
-f(W,Q(x)$(ax,wi(x))FOR(nx,wi(xi))w(10))             //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
+def1(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)  //!< (s)tring from (i)nteger: format a given atom x as decimal in range (-128..127) into buffer b using sprintf(3).
+def1(wi,w(si(x)))                                   //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
+def1(W,Q(x)$(ax,wi(x))FOR(nx,wi(xi))w(10))          //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
                                                     //!< separated by space. terminate output by a newline aka ascii 10.
 G(err,w(f);w(58);wi(x);w(y);w(10);ERR)              //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return ERR.
 
 //!malloc
-f(alloc,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))//!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
+def1(alloc,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))//!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
                                                     //!< and vector length to x in the preamble, and return pointer to the 0'th element of a new vector \see a.h type system
-f(unalloc,WS-=nx;free(sx-2);0)                      //!< release memory allocated for vector x.
+def1(unalloc,WS-=nx;free(sx-2);0)                   //!< release memory allocated for vector x.
 G(m,(u)memcpy((u8*)x,(u8*)y,f))                     //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
                                                     //!< \note memcpy(3) assumes that x/y don't overlap in ram, which in k/simple they can't, but \see memmove(3)
 //!memory management
-f(incref,ax?x:(++rx,x))                             //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
-f(decref,ax?x                                       //!< decrement refcount: if x is an atom, return x.
+def1(incref,ax?x:(++rx,x))                          //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
+def1(decref,ax?x                                    //!< decrement refcount: if x is an atom, return x.
        :rx?(--rx,x)                                 //!<   if x is a vector and its refcount is greater than 0, decrement it and return x.
           :unalloc(x))                              //!<   if refcount is 0, release memory occupied by x and return 0.
 
 //!monadic verbs
-f(foo,decref(x);Qz(1);ERR)
-F(Foo,decref(x);Qz(1);ERR)                          //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code ERR
+def1(foo,decref(x);Qz(1);ERR)
+def2(Foo,decref(x);Qz(1);ERR)                       //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code ERR
 
-f(sub,ax?(u8)-x:_x(NEW(nx,-xi)))                    //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
+def1(sub,ax?(u8)-x:_x(NEW(nx,-xi)))                 //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
                                                     //!< if x is a vector, return a new vector same as x only with sign of its every element flipped.
 
-f(til,Qr(!ax)(NEW(x,i)))                            //!< monadic til is !x aka her majesty apl iota. for a given atom x, it returns a vector
+def1(til,Qr(!ax)(NEW(x,i)))                         //!< monadic til is !x aka her majesty apl iota. for a given atom x, it returns a vector
                                                     //!< of x integers from 0 to x-1. if x is not an atom, til throws a rank error.
 
-f(cnt,Qr(ax)nx)                                     //!< monadic (c)ou(nt) is #x. it returns the length of a given vector and throws rank error for atoms.
+def1(cnt,Qr(ax)nx)                                  //!< monadic (c)ou(nt) is #x. it returns the length of a given vector and throws rank error for atoms.
 
-f(cat,Qr(!ax)NEW(1,x))                              //!< monadic (cat)enate is (enl)ist, or comma-x: wraps a given atom x into a new vector of length 1 whose
+def1(cat,Qr(!ax)NEW(1,x))                           //!< monadic (cat)enate is (enl)ist, or comma-x: wraps a given atom x into a new vector of length 1 whose
                                                     //!< only item holds the value of that atom. if x is a vector, enlist will throw a rank error.
 
-f(rev,Qr(ax)_x(NEW(nx,sx[nx-i-1])))                 //!< monadic (rev)erse is |x and simply returns a mirror copy of vector x.
+def1(rev,Qr(ax)_x(NEW(nx,sx[nx-i-1])))              //!< monadic (rev)erse is |x and simply returns a mirror copy of vector x.
 
 //!dyadic verbs
-F(Add,                                              //!< dyadic f+y is add. operands can be both atoms and verbs, ie. a+a, a+v, v+a, v+v are all valid.
+def2(Add,                                           //!< dyadic f+y is add. operands can be both atoms and verbs, ie. a+a, a+v, v+a, v+v are all valid.
   ax?af?(u8)(f+x)                                   //!< case a+a: if (f,x) are atoms, compute their sum and handle possible overflows by downcasting it to u8.
        :Add(x,f)                                    //!< case v+a: if f is a vector and x is an atom, make a recursive call with operands swapped, i.e. a+v.
     :af?_x(NEW(nx,f+xi))                            //!< case a+v: if f is an atom, return a new vector constructed by adding f to every element of x.
@@ -62,25 +62,25 @@ F(Add,                                              //!< dyadic f+y is add. oper
              :_f(_x(NEW(nx,xi+fi))))                //!<           if lengths are the same, return a new vector holding their pairwise sum.
                                                     //!< \note by convention, atwc uses x-y for inequality test, which has the same effect as nx!=nf.
 
-F(Sub,Add(f,sub(x)))                                //!< dyadic f-x is subtract. since we already have Add() and sub(), we get Sub() for free by negating x.
-F(Mod,Qr(!f||!af)ax?x%f:_x(NEW(nx,xi%f)))           //!< dyadic f!x is x (mod)ulo f, aka remainder operation. f must be an non-zero atom, x can be anything.
-F(Tak,Qr(!af)_f(NEW(f,ax?x:sx[i%nx])))              //!< dyadic f#x is (tak)e, which has two variants based on the type of right operand (left must be atom):
+def2(Sub,Add(f,sub(x)))                             //!< dyadic f-x is subtract. since we already have Add() and sub(), we get Sub() for free by negating x.
+def2(Mod,Qr(!f||!af)ax?x%f:_x(NEW(nx,xi%f)))        //!< dyadic f!x is x (mod)ulo f, aka remainder operation. f must be an non-zero atom, x can be anything.
+def2(Tak,Qr(!af)_f(NEW(f,ax?x:sx[i%nx])))           //!< dyadic f#x is (tak)e, which has two variants based on the type of right operand (left must be atom):
                                                     //!<  if x is a vector, return first f items of x. if f exceeds the size of x, wrap around from the start.
                                                     //!<  if x is an atom, return a vector of length f filled with x.
 
-F(Cat,                                              //!< dyadic f,x is (cat)enate: a) join two vectors b) join an atom to vector c) make a vector from two atoms.
+def2(Cat,                                           //!< dyadic f,x is (cat)enate: a) join two vectors b) join an atom to vector c) make a vector from two atoms.
   f=af?cat(f):f;                                    //!< if f is an atom, enlist it \see cat()
   x=ax?cat(x):x;                                    //!< ditto for x
   u r=alloc(nf+nx);                                 //!< (a)llocate array r long enough to hold f and x.
   m(nx,r+nf,x);                                     //!< (m)ove contents of x to the end of r.
   m(nf,r,f);decref(x);decref(f);r)                  //!< (m)ove contents of f to the beginning of r, try to release f and x, and return pointer to r.
 
-F(At,Qr(af)                                         //!< dyadic f@x is "needle at x in the haystack f" and has two modes based on the type of x (f must be a vector):
+def2(At,Qr(af)                                      //!< dyadic f@x is "needle at x in the haystack f" and has two modes based on the type of x (f must be a vector):
   ax?x>nf?Ql():sf[x]                                //!<  if x is an atom, return the x'th item of f.
     :_x(_f(NEW(nx,sf[xi]))))                        //!<  if x is a vector, return a vector containg items from f at indices listed in x.
                                                     //!< \note that the second mode currently doesn't perform the boundary check, fell free to implement it!
 
-f(at,At(x,0))                                       //!< monadic @x is simply (f)ir(st): return the head element of x, or throw a rank error if x is an atom.
+def1(at,At(x,0))                                    //!< monadic @x is simply (f)ir(st): return the head element of x, or throw a rank error if x is an atom.
 
 //! note how Sub() and at() are implemented in terms of other verbs, and especially how Add() cuts corners by calling itself with operands swapped.
 //! in fact, we can use Add() as a template to implement of a whole bunch of additional dyadic verbs, provided that they also hold commutative property.
@@ -96,7 +96,7 @@ f(at,At(x,0))                                       //!< monadic @x is simply (f
 //!     5.2 (i'th element of x) OP (i'th element of f)
 //!  6. finally, attempt to release memory of f and x, and return r.
 
-#define op(fn,OP) F(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(NEW(nx,f OP xi)):_f(_x(nx-nf?Ql():NEW(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
+#define op(fn,OP) def2(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(NEW(nx,f OP xi)):_f(_x(nx-nf?Ql():NEW(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
 op(Eql,==)op(Not,!=)op(And,&)op(Or,|)op(Prd,*)                //!< et voila, we have definitions of dyadic equal, not equal, and, or and product for free.
 
 //!verb dispatch
@@ -106,20 +106,20 @@ u(*verbs2[])(u,u)={0,Add,Sub,Mod,Tak,Cat,At,Eql,Not,And,Or, Prd};  //!< F[] is d
 // verbs:             +   -   !   #   ,   @  =   ~   &   |   *
 
 //!adverbs
-F(Ovr,ax?x:_x(r(*sx,FOR(nx-1,r=verbs2[f](r,sx[i+1])))))                       //!< adverb over: recursively fold all elements of vector x using dyadic verb f going left to right.
-F(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;FOR(nx-1,sr[i+1]=verbs2[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
+def2(Ovr,ax?x:_x(r(*sx,FOR(nx-1,r=verbs2[f](r,sx[i+1])))))                       //!< adverb over: recursively fold all elements of vector x using dyadic verb f going left to right.
+def2(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;FOR(nx-1,sr[i+1]=verbs2[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
 
 //!adverb dispatch
 char*adverbs=" /\\";
 u(*adverbs2[])(u,u)={0,Ovr,Scn};                    //!< adverbs[]/adverbs2[] is the same as verbs[]/verbs2[], only for adverbs.
 
 //!globals, verbs, nouns, adverbs
-f(g,x>='a'&&x<='z')                                 //!< is x a valid (g)lobal variable identifier?
-F(ag,y(U[f],!ay?unalloc(y):x;incref(U[f]=x)))       //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
-f(v,(strchr(verbs,x)?:verbs)-verbs)                 //!< is x a valid (v)erb from verbs? if so, return its index, otherwise return 0.
+def1(g,x>='a'&&x<='z')                              //!< is x a valid (g)lobal variable identifier?
+def2(ag,y(U[f],!ay?unalloc(y):x;incref(U[f]=x)))    //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
+def1(v,(strchr(verbs,x)?:verbs)-verbs)              //!< is x a valid (v)erb from verbs? if so, return its index, otherwise return 0.
                                                     //!< \note rarely seen ternary form x?:y, which is just a shortcut for x?x:y in c.
-f(d,(strchr(adverbs,x)?:adverbs)-adverbs)           //!< same as v() for a(d)verbs.
-f(n,10>x-'0'                                        //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
+def1(d,(strchr(adverbs,x)?:adverbs)-adverbs)        //!< same as v() for a(d)verbs.
+def1(n,10>x-'0'                                     //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
            ?x-'0'                                   //!< if x is a digit, e.g. '7', return its decimal value.
            :g(x)?incref(U[x-'a'])                   //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
                 :ERR)                               //!< ..anything else is an error.
