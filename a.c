@@ -124,14 +124,14 @@ f(n,10>x-'0'                                        //!< is x a (n)oun? valid no
 
 //!fio
 static char*l;u mx=99;FILE*t;                       //!< l is a line buffer, mx is its max length, t is input stream handle.
-us(rl,l=l?:malloc(mx);                              //!< (r)ead(l)ine: reset mx to max line length, allocate buffer l of size mx if not yet allocated.
+defstr(rl,l=l?:malloc(mx);                          //!< (r)ead(l)ine: reset mx to max line length, allocate buffer l of size mx if not yet allocated.
    P(!s,l[read(0,l,mx)-1]=0)                        //!< (r)ead: if no filename s is given, read line from stdin up to mx bytes, clamp trailing \n and return 0.
    t=t?:fopen(s,"r");Qs(!t,s)                       //!< open file s for reading if not yet open, throw error in case of problems.
    r(getline(&l,&mx,t),                             //!< read next line from stream t into l up to mx bytes.
      r=r<mx?l[r-('\n'==l[r-1])]=0:Q))               //!< if reached end of file, return Q, otherwise clamp trailing \n and return 0.
 
 //!eval
-us(e,                                               //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:
+defstr(e,                                           //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:
    u8*t=s;u8 i=*t++;                                //!< t is a temporary pointer to s. read the current token into i and advance temporary tape pointer.
    !*t?x(n(i),Qp()x)                                //!< if next token after i is null (ie end of tape): final token must be a noun, so return it, otherwise:
       :v(i)                                         //!< in case if i is a valid verb:

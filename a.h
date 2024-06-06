@@ -37,11 +37,11 @@ typedef unsigned long u;                                 //!< although u is form
                                                          //!< l-/r-values are fundamental to C, good mnemonic is (l)eft/(r)ight although not 100% precise.
 
 //!functions
-#define _u(f,e,x...) u f(x){R(u)_(e);}                   //!< generic function definition template: f name, x args, e body, all functions return some u
-#define f(g,e) _u(g,e,u x)                               //!< define a monadic function g: takes arg x of type u and returns some u, e is body
-#define F(g,e) _u(g,e,u f,u x)                           //!< define a dyadic function g: takes args f and x of type u, returns some u, or:
-#define G(g,e) _u(g,e,u f,u x,u y)                       //!< define an adverb g: takes a pointer to a verb f, x and y are operands, returns some u (nyi)
-#define us(f,e) _u(f,e,u8*s)                              //!< define a function f which takes a string s as its only argument, e is body
+#define def(f,e,x...) u f(x){R(u)_(e);}                  //!< generic function definition template: f name, x args, e body, all functions return some u
+#define f(g,e) def(g,e,u x)                              //!< define a monadic function g: takes arg x of type u and returns some u, e is body
+#define F(g,e) def(g,e,u f,u x)                          //!< define a dyadic function g: takes args f and x of type u, returns some u, or:
+#define G(g,e) def(g,e,u f,u x,u y)                      //!< define an adverb g: takes a pointer to a verb f, x and y are operands, returns some u (nyi)
+#define defstr(f,e) def(f,e,u8*s)                        //!< define a function f which takes a string s as its only argument, e is body
 
 //!accessors for x
 #define ax (256>x)                                       //!< is x an atom? (atoms are 0..255, x presumed to be of type u)
