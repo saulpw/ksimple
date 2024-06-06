@@ -148,9 +148,9 @@ us(e,                                               //!< (e)val: recursively eva
                          F[f](x,y))))               //!< apply dyadic verb f to nouns x and y (e.g. 2+3) and return result (noun or error).
 
 //!repl/batch
-int main(int c,char**v){u r=2==c;                   //!< entry point: r=0 is repl mode, r=1 is batch mode i.e. when a filename is passed.
-  r?:O("%s",BA);                                    //!< system banner is only printed in interactive mode.
-  while(r?:w(32),Q!=rl(v[1]))                       //!< enter infinite read-eval-print loop until ctrl+c is pressed, error or EOF is reached.
+int main(int argc,char**argv){u batch=2==argc;      //!< entry point: batch=0 is repl mode, batch=1 is batch mode i.e. when a filename is passed.
+  batch?:O("%s",BA);                                //!< system banner is only printed in interactive mode.
+  while(batch?:w(32),Q!=rl(argv[1]))                //!< enter infinite read-eval-print loop until ctrl+c is pressed, error or EOF is reached.
    if(*l){                                          //!< write prompt (single space), then wait for input from stdin which is read into b.
     $(92==*l&&!l[2],                                //!< if buffer starts with backslash and is two bytes long:
      $(92==l[1],break)                              //!<   if buffer is a double backslash, exit repl and terminate process.
