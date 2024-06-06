@@ -28,7 +28,7 @@ G(err,w(f);w(58);wi(x);w(y);w(10);ERR)              //!< (err)or: print name of 
 def1(alloc,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))//!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
                                                     //!< and vector length to x in the preamble, and return pointer to the 0'th element of a new vector \see a.h type system
 def1(unalloc,WS-=nx;free(sx-2);0)                   //!< release memory allocated for vector x.
-G(m,(u)memcpy((u8*)x,(u8*)y,f))                     //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
+G(move,(u)memcpy((u8*)x,(u8*)y,f))                  //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
                                                     //!< \note memcpy(3) assumes that x/y don't overlap in ram, which in k/simple they can't, but \see memmove(3)
 //!memory management
 def1(incref,ax?x:(++rx,x))                          //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
@@ -72,8 +72,8 @@ def2(Cat,                                           //!< dyadic f,x is (cat)enat
   f=af?cat(f):f;                                    //!< if f is an atom, enlist it \see cat()
   x=ax?cat(x):x;                                    //!< ditto for x
   u r=alloc(nf+nx);                                 //!< (a)llocate array r long enough to hold f and x.
-  m(nx,r+nf,x);                                     //!< (m)ove contents of x to the end of r.
-  m(nf,r,f);decref(x);decref(f);r)                  //!< (m)ove contents of f to the beginning of r, try to release f and x, and return pointer to r.
+  move(nx,r+nf,x);                                  //!< (m)ove contents of x to the end of r.
+  move(nf,r,f);decref(x);decref(f);r)               //!< (m)ove contents of f to the beginning of r, try to release f and x, and return pointer to r.
 
 def2(At,Qr(af)                                      //!< dyadic f@x is "needle at x in the haystack f" and has two modes based on the type of x (f must be a vector):
   ax?x>nf?Ql():sf[x]                                //!<  if x is an atom, return the x'th item of f.
