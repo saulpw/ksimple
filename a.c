@@ -22,7 +22,7 @@ f(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)     //!< (s)tring from (i)nteger
 f(wi,w(si(x)))                                      //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
 f(W,Q(x)$(ax,wi(x))FOR(nx,wi(xi))w(10))             //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
                                                     //!< separated by space. terminate output by a newline aka ascii 10.
-G(err,w(f);w(58);wi(x);w(y);w(10);Q)                //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return Q.
+G(err,w(f);w(58);wi(x);w(y);w(10);ERR)              //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return ERR.
 
 //!malloc
 f(alloc,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))//!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
@@ -37,8 +37,8 @@ f(decref,ax?x                                       //!< decrement refcount: if 
           :unalloc(x))                              //!<   if refcount is 0, release memory occupied by x and return 0.
 
 //!monadic verbs
-f(foo,decref(x);Qz(1);Q)
-F(Foo,decref(x);Qz(1);Q)                            //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
+f(foo,decref(x);Qz(1);ERR)
+F(Foo,decref(x);Qz(1);ERR)                          //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code ERR
 
 f(sub,ax?(u8)-x:_x(NEW(nx,-xi)))                    //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
                                                     //!< if x is a vector, return a new vector same as x only with sign of its every element flipped.
@@ -122,7 +122,7 @@ f(d,(strchr(AV,x)?:AV)-AV)                          //!< same as v() for a(d)ver
 f(n,10>x-'0'                                        //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
            ?x-'0'                                   //!< if x is a digit, e.g. '7', return its decimal value.
            :g(x)?incref(U[x-'a'])                   //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
-                :Q)                                 //!< ..anything else is an error.
+                :ERR)                               //!< ..anything else is an error.
 
 //!fio
 static char*l;u mx=99;FILE*t;                       //!< l is a line buffer, mx is its max length, t is input stream handle.
@@ -130,7 +130,7 @@ defstr(readln,l=l?:malloc(mx);                      //!< (r)ead(l)ine: reset mx 
    P(!s,l[read(0,l,mx)-1]=0)                        //!< (r)ead: if no filename s is given, read line from stdin up to mx bytes, clamp trailing \n and return 0.
    t=t?:fopen(s,"r");Qs(!t,s)                       //!< open file s for reading if not yet open, throw error in case of problems.
    r(getline(&l,&mx,t),                             //!< read next line from stream t into l up to mx bytes.
-     r=r<mx?l[r-('\n'==l[r-1])]=0:Q))               //!< if reached end of file, return Q, otherwise clamp trailing \n and return 0.
+     r=r<mx?l[r-('\n'==l[r-1])]=0:ERR))             //!< if reached end of file, return ERR, otherwise clamp trailing \n and return 0.
 
 //!eval
 defstr(eval,                                        //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:

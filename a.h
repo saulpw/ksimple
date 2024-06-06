@@ -68,14 +68,14 @@ typedef unsigned long u;                                 //!< although u is form
 #define fi x(f,xi)                                       //!< return i'th element of vector f or 0 if i is out of bounds
 
 //!error handling
-static const u Q=128;                                    //!< magic numer for error
-#define Q(e)    if(Q==(e))return Q;                      //!< if some e evaluates to Q, return error
+static const u ERR=128;                                  //!< magic number for error
+#define Q(e)    if(ERR==(e))return ERR;                  //!< if some e evaluates to ERR, return error
 #define Qe(s)   err((u)__FUNCTION__,(u)__LINE__,(u)s)    //!< shortcut for err(): pass function name and error string s
 #define Qs(e,s) if(e)return Qe(s);                       //!< error template: if some e evaluates to true, throw an error
 #define Qr(e)   Qs(e,"rank")                             //!< if some e evaluates to true, throw rank error
 #define Qz(e)   Qs(e,"nyi")                              //!< ..not yet implemented
 #define Qd(e)   Qs(e,"domain")                           //!< domain error
-#define Qp()    Qs(Q==x,"parse")                         //!< parse error
+#define Qp()    Qs(ERR==x,"parse")                       //!< parse error
 #define Ql()    Qe("length")                             //!< length error
 
 //!all of the above coming together:
