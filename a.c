@@ -22,13 +22,13 @@ def1(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)  //!< (s)tring from (i)nteger
 def1(wi,w(si(x)))                                   //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
 def1(W,Q(x)$(ax,wi(x))FOR(nx,wi(xi))w(10))          //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
                                                     //!< separated by space. terminate output by a newline aka ascii 10.
-G(err,w(f);w(':');wi(x);w(y);w('\n');ERR)           //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return ERR.
+def3(err,w(f);w(':');wi(x);w(y);w('\n');ERR)        //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return ERR.
 
 //!malloc
 def1(alloc,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))//!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
                                                     //!< and vector length to x in the preamble, and return pointer to the 0'th element of a new vector \see a.h type system
 def1(unalloc,WS-=nx;free(sx-2);0)                   //!< release memory allocated for vector x.
-G(move,(u)memcpy((u8*)x,(u8*)y,f))                  //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
+def3(move,(u)memcpy((u8*)x,(u8*)y,f))               //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
                                                     //!< \note memcpy(3) assumes that x/y don't overlap in ram, which in k/simple they can't, but \see memmove(3)
 //!memory management
 def1(incref,ax?x:(++rx,x))                          //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
