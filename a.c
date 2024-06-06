@@ -31,14 +31,14 @@ f(unalloc,WS-=nx;free(sx-2);0)                      //!< release memory allocate
 G(m,(u)memcpy((u8*)x,(u8*)y,f))                     //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
                                                     //!< \note memcpy(3) assumes that x/y don't overlap in ram, which in k/simple they can't, but \see memmove(3)
 //!memory management
-f(r_,ax?x:(++rx,x))                                 //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
-f(_r,ax?x                                           //!< decrement refcount: if x is an atom, return x.
+f(incref,ax?x:(++rx,x))                             //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
+f(decref,ax?x                                       //!< decrement refcount: if x is an atom, return x.
        :rx?(--rx,x)                                 //!<   if x is a vector and its refcount is greater than 0, decrement it and return x.
           :unalloc(x))                              //!<   if refcount is 0, release memory occupied by x and return 0.
 
 //!monadic verbs
-f(foo,_r(x);Qz(1);Q)
-F(Foo,_r(x);Qz(1);Q)                                //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
+f(foo,decref(x);Qz(1);Q)
+F(Foo,decref(x);Qz(1);Q)                            //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
 
 f(sub,ax?(u8)-x:_x(NEW(nx,-xi)))                    //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
                                                     //!< if x is a vector, return a new vector same as x only with sign of its every element flipped.
@@ -73,7 +73,7 @@ F(Cat,                                              //!< dyadic f,x is (cat)enat
   x=ax?cat(x):x;                                    //!< ditto for x
   u r=alloc(nf+nx);                                 //!< (a)llocate array r long enough to hold f and x.
   m(nx,r+nf,x);                                     //!< (m)ove contents of x to the end of r.
-  m(nf,r,f);_r(x);_r(f);r)                          //!< (m)ove contents of f to the beginning of r, try to release f and x, and return pointer to r.
+  m(nf,r,f);decref(x);decref(f);r)                  //!< (m)ove contents of f to the beginning of r, try to release f and x, and return pointer to r.
 
 F(At,Qr(af)                                         //!< dyadic f@x is "needle at x in the haystack f" and has two modes based on the type of x (f must be a vector):
   ax?x>nf?Ql():sf[x]                                //!<  if x is an atom, return the x'th item of f.
@@ -115,13 +115,13 @@ u(*D[])(u,u)={0,Ovr,Scn};                           //!< AV[]/D[] is the same as
 
 //!globals, verbs, nouns, adverbs
 f(g,x>='a'&&x<='z')                                 //!< is x a valid (g)lobal variable identifier?
-F(ag,y(U[f],!ay?unalloc(y):x;r_(U[f]=x)))           //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
+F(ag,y(U[f],!ay?unalloc(y):x;incref(U[f]=x)))       //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
 f(v,(strchr(V,x)?:V)-V)                             //!< is x a valid (v)erb from V? if so, return its index, otherwise return 0.
                                                     //!< \note rarely seen ternary form x?:y, which is just a shortcut for x?x:y in c.
 f(d,(strchr(AV,x)?:AV)-AV)                          //!< same as v() for a(d)verbs.
 f(n,10>x-'0'                                        //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
            ?x-'0'                                   //!< if x is a digit, e.g. '7', return its decimal value.
-           :g(x)?r_(U[x-'a'])                       //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
+           :g(x)?incref(U[x-'a'])                   //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
                 :Q)                                 //!< ..anything else is an error.
 
 //!fio

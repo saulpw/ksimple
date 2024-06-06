@@ -88,8 +88,8 @@ static const u Q=128;                                    //!< magic numer for er
                                                          //!< u f=NEW(8,pow(2,i));   //!< f is (1,2,4,8,16,32,64,128,256)
                                                          //!< u y=NEW(8,xi==fi);     //!< y is (0,1,1,0,0,0,0,0)
 
-#define _f(e) r(e,_r(f))                                 //!< execute some (e)xpression, then decrement refcount of f, potentially releasing it, and (r)eturn f.
-#define _x(e) r(e,_r(x))                                 //!< ..same for x.
+#define _f(e) r(e,decref(f))                             //!< execute some (e)xpression, then decrement refcount of f, potentially releasing it, and (r)eturn f.
+#define _x(e) r(e,decref(x))                             //!< ..same for x.
 
                                                          //!< \note it would make sense to redefine u as an alias for uintptr_t to reduce
                                                          //!< pressure on 32bit targets, e.g. for wasm32 there is no reason for u to
