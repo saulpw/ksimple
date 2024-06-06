@@ -22,7 +22,7 @@ def1(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)  //!< (s)tring from (i)nteger
 def1(wi,w(si(x)))                                   //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
 def1(W,Q(x)$(ax,wi(x))FOR(nx,wi(xi))w(10))          //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
                                                     //!< separated by space. terminate output by a newline aka ascii 10.
-G(err,w(f);w(58);wi(x);w(y);w(10);ERR)              //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return ERR.
+G(err,w(f);w(':');wi(x);w(y);w('\n');ERR)           //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return ERR.
 
 //!malloc
 def1(alloc,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))//!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
