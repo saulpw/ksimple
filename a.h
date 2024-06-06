@@ -95,7 +95,7 @@ static const u ERR=128;                                  //!< magic number for e
                                                          //!< for simplicity, we keep u as ull for now.
 
 static u WS=0;                                           //!< WS workspace size (current number of bytes allocated).
-static u U[26];                                          //!< global namespace: array of values of variables abc..xyz. in C, global arrays are initalized with zeroes.
+static u globals[26];                                    //!< global namespace: array of values of variables abc..xyz. in C, global arrays are initalized with zeroes.
 
 #define BA "k/simple (c) 2024 atw/kpc\n"                 //!< startup banner
 
