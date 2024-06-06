@@ -7,8 +7,8 @@
 #include<fcntl.h>   //open
 
 //!minimal type system
-typedef unsigned char c;typedef unsigned long u;         //!< type c is a shorthand for byte, but type u requires more words:
-                                                         //!< although u is formally defined as unsigned 64bit integer,
+typedef unsigned char u8;                                //!< type u8 is a shorthand for byte
+typedef unsigned long u;                                 //!< although u is formally defined as unsigned 64bit integer,
                                                          //!< it is in fact an *opaque type*, i.e. k/simple uses it for everything,
                                                          //!< e.g. u can be: an atom (-128..127), a vector pointer or a function pointer.
                                                          //!< since k/simple only supports a single atom type (8bit integer),
@@ -41,11 +41,11 @@ typedef unsigned char c;typedef unsigned long u;         //!< type c is a shorth
 #define f(g,e) _u(g,e,u x)                               //!< define a monadic function g: takes arg x of type u and returns some u, e is body
 #define F(g,e) _u(g,e,u f,u x)                           //!< define a dyadic function g: takes args f and x of type u, returns some u, or:
 #define G(g,e) _u(g,e,u f,u x,u y)                       //!< define an adverb g: takes a pointer to a verb f, x and y are operands, returns some u (nyi)
-#define us(f,e) _u(f,e,c*s)                              //!< define a function f which takes a string s as its only argument, e is body
+#define us(f,e) _u(f,e,u8*s)                              //!< define a function f which takes a string s as its only argument, e is body
 
 //!accessors for x
 #define ax (256>x)                                       //!< is x an atom? (atoms are 0..255, x presumed to be of type u)
-#define sx ((c*)x)                                       //!< reinterpret x as char pointer (ie as string or byte vector)
+#define sx ((u8*)x)                                      //!< reinterpret x as char pointer (ie as string or byte vector)
 #define xi (nx>i?sx[i]:0)                                //!< return i'th element of vector x or 0 if i is out of bounds
 #define nx sx[-1]                                        //!< length of vector x (second byte of the preamble preceding the actual data \see typedef u)
 #define rx sx[-2]                                        //!< refcount of vector x (first byte of the preamble preceding the actual data \see typedef u)

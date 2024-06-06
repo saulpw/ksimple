@@ -16,8 +16,8 @@ f(wu,O("%lu\n",x))                                  //!< (w)rite (u)ll: print un
 void wg(){i(26,x(U[i],$(!ax,O("%c[%d] %d\n",i+97,nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
 
 //!printing facilities
-f(w,write(1,ax?(c*)&x:sx,ax?1:strlen(sx)))          //!< (w)rite to stdout: if x is an atom, print its decimal value, otherwise print x as ascii string.
-static c pb[12];                                    //!< temporary string (b)uffer for formatting vector items. it's ok to declare it globally, since we only have one thread.
+f(w,write(1,ax?(u8*)&x:sx,ax?1:strlen(sx)))         //!< (w)rite to stdout: if x is an atom, print its decimal value, otherwise print x as ascii string.
+static u8 pb[12];                                   //!< temporary string (b)uffer for formatting vector items. it's ok to declare it globally, since we only have one thread.
 f(si,sprintf(pb,"%d ",(int)(128>x?x:x-256));pb)     //!< (s)tring from (i)nteger: format a given atom x as decimal in range (-128..127) into buffer b using sprintf(3).
 f(wi,w(si(x)))                                      //!< (w)rite (i)nteger: format x and (w)rite it to stdout.
 f(W,Q(x)$(ax,wi(x))i(nx,wi(xi))w(10))               //!< pretty print x: if x is an atom, format and print it, otherwise print all items of vector x,
@@ -25,10 +25,10 @@ f(W,Q(x)$(ax,wi(x))i(nx,wi(xi))w(10))               //!< pretty print x: if x is
 G(err,w(f);w(58);wi(x);w(y);w(10);Q)                //!< (err)or: print name of the c (f)unction where error occured, line number and error msg, return Q.
 
 //!malloc
-f(a,y(x+2,WS+=x;c*s=malloc(y);*s++=0;*s++=x;s))     //!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
+f(a,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))    //!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
                                                     //!< and vector length to x in the preamble, and return pointer to the 0'th element of a new vector \see a.h type system
 f(_a,WS-=nx;free(sx-2);0)                           //!< release memory allocated for vector x.
-G(m,(u)memcpy((c*)x,(c*)y,f))                       //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
+G(m,(u)memcpy((u8*)x,(u8*)y,f))                     //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
                                                     //!< \note memcpy(3) assumes that x/y don't overlap in ram, which in k/simple they can't, but \see memmove(3)
 //!memory management
 f(r_,ax?x:(++rx,x))                                 //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
@@ -39,7 +39,7 @@ f(_r,ax?x                                           //!< decrement refcount: if 
 //!monadic verbs
 f(foo,_r(x);Qz(1);Q)F(Foo,_r(x);Qz(1);Q)            //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
 
-f(sub,ax?(c)-x:_x(N(nx,-xi)))                       //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
+f(sub,ax?(u8)-x:_x(N(nx,-xi)))                      //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
                                                     //!< if x is a vector, return a new vector same as x only with sign of its every element flipped.
 
 f(til,Qr(!ax)(N(x,i)))                              //!< monadic til is !x aka her majesty apl iota. for a given atom x, it returns a vector
@@ -54,7 +54,7 @@ f(rev,Qr(ax)_x(N(nx,sx[nx-i-1])))                   //!< monadic (rev)erse is |x
 
 //!dyadic verbs
 F(Add,                                              //!< dyadic f+y is add. operands can be both atoms and verbs, ie. a+a, a+v, v+a, v+v are all valid.
-  ax?af?(c)(f+x)                                    //!< case a+a: if (f,x) are atoms, compute their sum and handle possible overflows by downcasting it to c.
+  ax?af?(u8)(f+x)                                   //!< case a+a: if (f,x) are atoms, compute their sum and handle possible overflows by downcasting it to u8.
        :Add(x,f)                                    //!< case v+a: if f is a vector and x is an atom, make a recursive call with operands swapped, i.e. a+v.
     :af?_x(N(nx,f+xi))                              //!< case a+v: if f is an atom, return a new vector constructed by adding f to every element of x.
        :nx-nf?(_x(_f(Ql())))                        //!< case v+v: if (f,x) are vectors, first make sure they are of the same length, throw length error if not.
@@ -95,7 +95,7 @@ f(at,At(x,0))                                       //!< monadic @x is simply (f
 //!     5.2 (i'th element of x) OP (i'th element of f)
 //!  6. finally, attempt to release memory of f and x, and return r.
 
-#define op(fn,OP) F(fn,ax?af?(c)(f OP x):fn(x,f):af?_x(N(nx,f OP xi)):_f(_x(nx-nf?Ql():N(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
+#define op(fn,OP) F(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(N(nx,f OP xi)):_f(_x(nx-nf?Ql():N(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
 op(Eql,==)op(Not,!=)op(And,&)op(Or,|)op(Prd,*)                //!< et voila, we have definitions of dyadic equal, not equal, and, or and product for free.
 
 //!verb dispatch
@@ -132,7 +132,7 @@ us(rl,l=l?:malloc(mx);                              //!< (r)ead(l)ine: reset mx 
 
 //!eval
 us(e,                                               //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:
-   c*t=s;c i=*t++;                                  //!< t is a temporary pointer to s. read the current token into i and advance temporary tape pointer.
+   u8*t=s;u8 i=*t++;                                //!< t is a temporary pointer to s. read the current token into i and advance temporary tape pointer.
    !*t?x(n(i),Qp()x)                                //!< if next token after i is null (ie end of tape): final token must be a noun, so return it, otherwise:
       :v(i)                                         //!< in case if i is a valid verb:
            ?d(*t)?x(e(t+1),Q(x)                     //!<   if the verb is followed by an adverb, recursively evaluate token after adverb into x. bail out on error.
@@ -144,7 +144,7 @@ us(e,                                               //!< (e)val: recursively eva
               58==*t                                //!<   special case: if y is preceded by a colon instead of a verb, it is an inline assignment (eg 1+a:1),
                     ?x(g(i),Qp()ag(i-97,y))         //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in U[26], and return it.
                     :x(n(i),Qp()                    //!<   x is a noun to the left of the verb. throw parse error if it is invalid.
-                         c f=v(*t);Qd(!f)           //!<   f is the index of the verb to the left of noun y. if it's not a valid verb, throw domain error.
+                         u8 f=v(*t);Qd(!f)          //!<   f is the index of the verb to the left of noun y. if it's not a valid verb, throw domain error.
                          F[f](x,y))))               //!< apply dyadic verb f to nouns x and y (e.g. 2+3) and return result (noun or error).
 
 //!repl/batch
