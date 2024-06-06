@@ -24,7 +24,6 @@ typedef unsigned long u;                                 //!< although u is form
                                                          //!<            byte prior to vector length holds the (r)eference count.
 
 //!minimal atwc
-#define R return                                         //!< unclutter
 #define O printf                                         //!< classic atw debug
 #define $(a,b) if(a)b;else                               //!< handy shorthand for if-then-else. beware of dangling else!
 #define FOR(n,e) {int $n=n;int i=0;for(;i<$n;++i){e;}}   //!< (i)terate: execute (e)xpression n times, loop counter i is accessible from e
@@ -37,7 +36,7 @@ typedef unsigned long u;                                 //!< although u is form
                                                          //!< l-/r-values are fundamental to C, good mnemonic is (l)eft/(r)ight although not 100% precise.
 
 //!functions
-#define def(f,e,x...) u f(x){R(u)_(e);}                  //!< generic function definition template: f name, x args, e body, all functions return some u
+#define def(f,e,x...) u f(x){return(u)_(e);}             //!< generic function definition template: f name, x args, e body, all functions return some u
 #define f(g,e) def(g,e,u x)                              //!< define a monadic function g: takes arg x of type u and returns some u, e is body
 #define F(g,e) def(g,e,u f,u x)                          //!< define a dyadic function g: takes args f and x of type u, returns some u, or:
 #define G(g,e) def(g,e,u f,u x,u y)                      //!< define an adverb g: takes a pointer to a verb f, x and y are operands, returns some u (nyi)
@@ -70,9 +69,9 @@ typedef unsigned long u;                                 //!< although u is form
 
 //!error handling
 static const u Q=128;                                    //!< magic numer for error
-#define Q(e)    if(Q==(e))R Q;                           //!< if some e evaluates to Q, return error
+#define Q(e)    if(Q==(e))return Q;                      //!< if some e evaluates to Q, return error
 #define Qe(s)   err((u)__FUNCTION__,(u)__LINE__,(u)s)    //!< shortcut for err(): pass function name and error string s
-#define Qs(e,s) if(e)R Qe(s);                            //!< error template: if some e evaluates to true, throw an error
+#define Qs(e,s) if(e)return Qe(s);                       //!< error template: if some e evaluates to true, throw an error
 #define Qr(e)   Qs(e,"rank")                             //!< if some e evaluates to true, throw rank error
 #define Qz(e)   Qs(e,"nyi")                              //!< ..not yet implemented
 #define Qd(e)   Qs(e,"domain")                           //!< domain error

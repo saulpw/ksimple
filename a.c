@@ -162,6 +162,6 @@ int main(int argc,char**argv){u batch=2==argc;      //!< entry point: batch=0 is
          x(eval(l),                                 //!< else, evaluate buffer b[] and put result into x, then:
            ':'==l[1]?x                              //!<   if b starts with a global assignment e.g. a:7, suppress output and cycle repl.
                    :_x(W(x)));}                     //!<   otherwise, pretty print evaluation result to stdout, then cycle repl.
-  R free(l),fclose(t),0;}                           //!< in C, return value of main() is the exit code of the process, 0 is success.
+  return free(l),fclose(t),0;}                      //!< in C, return value of main() is the exit code of the process, 0 is success.
 
 //:~
