@@ -129,12 +129,14 @@ def1(n,10>x-'0'                                     //!< is x a (n)oun? valid no
                 :ERR)                               //!< ..anything else is an error.
 
 //!fio
-static char*l;u mx=99;FILE*t;                       //!< l is a line buffer, mx is its max length, t is input stream handle.
-defstr(readln,l=l?:malloc(mx);                      //!< (r)ead(l)ine: reset mx to max line length, allocate buffer l of size mx if not yet allocated.
-   P(!s,l[read(0,l,mx)-1]=0)                        //!< (r)ead: if no filename s is given, read line from stdin up to mx bytes, clamp trailing \n and return 0.
-   t=t?:fopen(s,"r");Qs(!t,s)                       //!< open file s for reading if not yet open, throw error in case of problems.
-   r(getline(&l,&mx,t),                             //!< read next line from stream t into l up to mx bytes.
-     r=r<mx?l[r-('\n'==l[r-1])]=0:ERR))             //!< if reached end of file, return ERR, otherwise clamp trailing \n and return 0.
+static char*line;
+u linemax=99;
+FILE*fp;                                            //!< line is a line buffer, linemax is its max length, fp is input stream handle.
+defstr(readln,line=line?:malloc(linemax);           //!< readln: reset linemax to max line length, allocate buffer line of size linemax if not yet allocated.
+   P(!s,line[read(0,line,linemax)-1]=0)             //!< (r)ead: if no filename s is given, read line from stdin up to linemax bytes, clamp trailing \n and return 0.
+   fp=fp?:fopen(s,"r");Qs(!fp,s)                    //!< open file s for reading if not yet open, throw error in case of problems.
+   r(getline(&line,&linemax,fp),                    //!< read next line from stream fp into line up to linemax bytes.
+     r=r<linemax?line[r-('\n'==line[r-1])]=0:ERR))  //!< if reached end of file, return ERR, otherwise clamp trailing \n and return 0.
 
 //!eval
 defstr(eval,                                        //!< (e)val: recursively evaluate input tape s in reverse order (left of right), and return the final result:
@@ -157,15 +159,15 @@ defstr(eval,                                        //!< (e)val: recursively eva
 int main(int argc,char**argv){u batch=2==argc;      //!< entry point: batch=0 is repl mode, batch=1 is batch mode i.e. when a filename is passed.
   batch?:printf("%s",BA);                           //!< system banner is only printed in interactive mode.
   while(batch?:w(32),ERR!=readln(argv[1]))          //!< enter infinite read-eval-print loop until ctrl+c is pressed, error or EOF is reached.
-   if(*l){                                          //!< write prompt (single space), then wait for input from stdin which is read into b.
-    $('\\'==*l&&!l[2],                              //!< if buffer starts with backslash and is two bytes long:
-     $('\\'==l[1],break)                            //!<   if buffer is a double backslash, exit repl and terminate process.
-      $('w'==l[1],wu(WS))                           //!<   if buffer is a \w, print workspace usage and cycle repl.
-       $('v'==l[1],wg()))                           //!<   if buffer is a \v, print globals and their refcounts (useful for debug).
-        $('/'==*l,continue)                         //!< if buffer starts with /, treat the rest of the line as comment and cycle repl.
-         x(eval(l),                                 //!< else, evaluate buffer b[] and put result into x, then:
-           ':'==l[1]?x                              //!<   if b starts with a global assignment e.g. a:7, suppress output and cycle repl.
+   if(*line){                                       //!< write prompt (single space), then wait for input from stdin which is read into b.
+    $('\\'==*line&&!line[2],                        //!< if buffer starts with backslash and is two bytes long:
+     $('\\'==line[1],break)                         //!<   if buffer is a double backslash, exit repl and terminate process.
+      $('w'==line[1],wu(WS))                        //!<   if buffer is a \w, print workspace usage and cycle repl.
+       $('v'==line[1],wg()))                        //!<   if buffer is a \v, print globals and their refcounts (useful for debug).
+        $('/'==*line,continue)                      //!< if buffer starts with /, treat the rest of the line as comment and cycle repl.
+         x(eval(line),                              //!< else, evaluate buffer b[] and put result into x, then:
+           ':'==line[1]?x                           //!<   if b starts with a global assignment e.g. a:7, suppress output and cycle repl.
                    :_x(W(x)));}                     //!<   otherwise, pretty print evaluation result to stdout, then cycle repl.
-  return free(l),fclose(t),0;}                      //!< in C, return value of main() is the exit code of the process, 0 is success.
+  return free(line),fclose(fp),0;}                  //!< in C, return value of main() is the exit code of the process, 0 is success.
 
 //:~
