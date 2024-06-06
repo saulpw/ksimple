@@ -124,7 +124,7 @@ f(n,10>x-'0'                                        //!< is x a (n)oun? valid no
 
 //!fio
 static char*l;u mx=99;FILE*t;                       //!< l is a line buffer, mx is its max length, t is input stream handle.
-defstr(rl,l=l?:malloc(mx);                          //!< (r)ead(l)ine: reset mx to max line length, allocate buffer l of size mx if not yet allocated.
+defstr(readln,l=l?:malloc(mx);                      //!< (r)ead(l)ine: reset mx to max line length, allocate buffer l of size mx if not yet allocated.
    P(!s,l[read(0,l,mx)-1]=0)                        //!< (r)ead: if no filename s is given, read line from stdin up to mx bytes, clamp trailing \n and return 0.
    t=t?:fopen(s,"r");Qs(!t,s)                       //!< open file s for reading if not yet open, throw error in case of problems.
    r(getline(&l,&mx,t),                             //!< read next line from stream t into l up to mx bytes.
@@ -149,8 +149,8 @@ defstr(eval,                                        //!< (e)val: recursively eva
 
 //!repl/batch
 int main(int argc,char**argv){u batch=2==argc;      //!< entry point: batch=0 is repl mode, batch=1 is batch mode i.e. when a filename is passed.
-  batch?:O("%s",BA);                                //!< system banner is only printed in interactive mode.
-  while(batch?:w(32),Q!=rl(argv[1]))                //!< enter infinite read-eval-print loop until ctrl+c is pressed, error or EOF is reached.
+  batch?:printf("%s",BA);                           //!< system banner is only printed in interactive mode.
+  while(batch?:w(32),ERR!=readln(argv[1]))          //!< enter infinite read-eval-print loop until ctrl+c is pressed, error or EOF is reached.
    if(*l){                                          //!< write prompt (single space), then wait for input from stdin which is read into b.
     $('\\'==*l&&!l[2],                              //!< if buffer starts with backslash and is two bytes long:
      $('\\'==l[1],break)                            //!<   if buffer is a double backslash, exit repl and terminate process.
