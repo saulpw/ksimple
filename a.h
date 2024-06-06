@@ -80,7 +80,7 @@ static const u Q=128;                                    //!< magic numer for er
 #define Ql()    Qe("length")                             //!< length error
 
 //!all of the above coming together:
-#define N(n,e) r(a(n),i(n,ri=e))                         //!< this macro is the foundation of k/simple and is ubiquitous in a.c. it reads:
+#define N(n,e) r(alloc(n),i(n,ri=e))                     //!< this macro is the foundation of k/simple and is ubiquitous in a.c. it reads:
                                                          //!< (a)llocate a (N)ew vector r of le(n)gth n, then apply some (e)xpression to it, then return r.
                                                          //!< here are few basic examples to illustrate what "apply" means:
 

@@ -25,16 +25,16 @@ f(W,Q(x)$(ax,wi(x))i(nx,wi(xi))w(10))               //!< pretty print x: if x is
 G(err,w(f);w(58);wi(x);w(y);w(10);Q)                //!< (err)or: print name of the C (f)unction where error occured, line number and error msg, return Q.
 
 //!malloc
-f(a,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))    //!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
+f(alloc,y(x+2,WS+=x;u8*s=malloc(y);*s++=0;*s++=x;s))//!< (a)llocate x bytes of memory for a vector of length x plus two extra bytes for preamble, set refcount to 0
                                                     //!< and vector length to x in the preamble, and return pointer to the 0'th element of a new vector \see a.h type system
-f(_a,WS-=nx;free(sx-2);0)                           //!< release memory allocated for vector x.
+f(unalloc,WS-=nx;free(sx-2);0)                      //!< release memory allocated for vector x.
 G(m,(u)memcpy((u8*)x,(u8*)y,f))                     //!< (m)ove: x and y are pointers to source and destination, f is number of bytes to be copied from x to y.
                                                     //!< \note memcpy(3) assumes that x/y don't overlap in ram, which in k/simple they can't, but \see memmove(3)
 //!memory management
 f(r_,ax?x:(++rx,x))                                 //!< increment refcount: if x is an atom, return x. if x is a vector, increment its refcount and return x.
 f(_r,ax?x                                           //!< decrement refcount: if x is an atom, return x.
        :rx?(--rx,x)                                 //!<   if x is a vector and its refcount is greater than 0, decrement it and return x.
-          :_a(x))                                   //!<   if refcount is 0, release memory occupied by x and return 0.
+          :unalloc(x))                              //!<   if refcount is 0, release memory occupied by x and return 0.
 
 //!monadic verbs
 f(foo,_r(x);Qz(1);Q)F(Foo,_r(x);Qz(1);Q)            //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
@@ -70,7 +70,7 @@ F(Tak,Qr(!af)_f(N(f,ax?x:sx[i%nx])))                //!< dyadic f#x is (tak)e, w
 F(Cat,                                              //!< dyadic f,x is (cat)enate: a) join two vectors b) join an atom to vector c) make a vector from two atoms.
   f=af?cat(f):f;                                    //!< if f is an atom, enlist it \see cat()
   x=ax?cat(x):x;                                    //!< ditto for x
-  u r=a(nf+nx);                                     //!< (a)llocate array r long enough to hold f and x.
+  u r=alloc(nf+nx);                                 //!< (a)llocate array r long enough to hold f and x.
   m(nx,r+nf,x);                                     //!< (m)ove contents of x to the end of r.
   m(nf,r,f);_r(x);_r(f);r)                          //!< (m)ove contents of f to the beginning of r, try to release f and x, and return pointer to r.
 
@@ -106,14 +106,14 @@ u(*f[])(u  )={0,foo,sub,til,cnt,cat,at,foo,foo,foo,rev,foo},  //!< f[] is an arr
 
 //!adverbs
 F(Ovr,ax?x:_x(r(*sx,i(nx-1,r=F[f](r,sx[i+1])))))                       //!< adverb over: recursively fold all elements of vector x using dyadic verb f going left to right.
-F(Scn,ax?x:_x(r(a(nx),*sr=*sx;i(nx-1,sr[i+1]=F[f](sr[i],sx[i+1])))))   //!< adverb scan: same as over, but produces a vector of intermediate results.
+F(Scn,ax?x:_x(r(alloc(nx),*sr=*sx;i(nx-1,sr[i+1]=F[f](sr[i],sx[i+1]))))) //!< adverb scan: same as over, but produces a vector of intermediate results.
 
 //!adverb dispatch
 char*AV=" /\\";u(*D[])(u,u)={0,Ovr,Scn};            //!< AV[]/D[] is the same as V[]/F[], only for adverbs.
 
 //!globals, verbs, nouns, adverbs
 f(g,x>='a'&&x<='z')                                 //!< is x a valid (g)lobal variable identifier?
-F(ag,y(U[f],!ay?_a(y):x;r_(U[f]=x)))                //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
+F(ag,y(U[f],!ay?unalloc(y):x;r_(U[f]=x)))           //!< (a)ssign (g)lobal: release no longer referenced global object at U[f], and replace it with object x.
 f(v,(strchr(V,x)?:V)-V)                             //!< is x a valid (v)erb from V? if so, return its index, otherwise return 0.
                                                     //!< \note rarely seen ternary form x?:y, which is just a shortcut for x?x:y in c.
 f(d,(strchr(AV,x)?:AV)-AV)                          //!< same as v() for a(d)verbs.
