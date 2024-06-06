@@ -24,7 +24,6 @@ typedef unsigned long u;                                 //!< although u is form
                                                          //!<            byte prior to vector length holds the (r)eference count.
 
 //!minimal atwc
-#define O printf                                         //!< classic atw debug
 #define $(a,b) if(a)b;else                               //!< handy shorthand for if-then-else. beware of dangling else!
 #define FOR(n,e) {int $n=n;int i=0;for(;i<$n;++i){e;}}   //!< (i)terate: execute (e)xpression n times, loop counter i is accessible from e
 #define P(b,e) if(b)return _(e);                         //!< predicate aka panic: if b evaluates to true, return result of e.

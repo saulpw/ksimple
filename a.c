@@ -12,8 +12,8 @@
                                                     //! cc -w ..       minimal build instructions (which are much more stringent in provided makefile)
 
 //!debug
-f(wu,O("%lu\n",x))                                  //!< (w)rite (u)ll: print unsigned long long (e.g. total memory allocation), useful for refcount debugging.
-void wg(){FOR(26,x(U[i],$(!ax,O("%c[%d] %d\n",i+'a',nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
+f(wu,printf("%lu\n",x))                             //!< (w)rite (u)ll: print unsigned long long (e.g. total memory allocation), useful for refcount debugging.
+void wg(){FOR(26,x(U[i],$(!ax,printf("%c[%d] %d\n",i+'a',nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
 
 //!printing facilities
 f(w,write(1,ax?(u8*)&x:sx,ax?1:strlen(sx)))         //!< (w)rite to stdout: if x is an atom, print its decimal value, otherwise print x as ascii string.
