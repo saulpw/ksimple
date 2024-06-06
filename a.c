@@ -13,7 +13,7 @@
 
 //!debug
 f(wu,O("%lu\n",x))                                  //!< (w)rite (u)ll: print unsigned long long (e.g. total memory allocation), useful for refcount debugging.
-void wg(){i(26,x(U[i],$(!ax,O("%c[%d] %d\n",i+97,nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
+void wg(){i(26,x(U[i],$(!ax,O("%c[%d] %d\n",i+'a',nx,rx))))} //!< dump global namespace: varname, refcount, length (also useful for refcount debugging).
 
 //!printing facilities
 f(w,write(1,ax?(u8*)&x:sx,ax?1:strlen(sx)))         //!< (w)rite to stdout: if x is an atom, print its decimal value, otherwise print x as ascii string.
@@ -117,9 +117,9 @@ F(ag,y(U[f],!ay?_a(y):x;r_(U[f]=x)))                //!< (a)ssign (g)lobal: rele
 f(v,(strchr(V,x)?:V)-V)                             //!< is x a valid (v)erb from V? if so, return its index, otherwise return 0.
                                                     //!< \note rarely seen ternary form x?:y, which is just a shortcut for x?x:y in c.
 f(d,(strchr(AV,x)?:AV)-AV)                          //!< same as v() for a(d)verbs.
-f(n,10>x-48                                         //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
-           ?x-48                                    //!< if x is a digit, e.g. '7', return its decimal value.
-           :g(x)?r_(U[x-97])                        //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
+f(n,10>x-'0'                                        //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
+           ?x-'0'                                   //!< if x is a digit, e.g. '7', return its decimal value.
+           :g(x)?r_(U[x-'a'])                       //!< if x is a varname, e.g. 'a', return its value from U[26] and increment its refcount.
                 :Q)                                 //!< ..anything else is an error.
 
 //!fio
@@ -141,8 +141,8 @@ us(e,                                               //!< (e)val: recursively eva
               f[v(i)](x))                           //!<   apply monadic verb i to the operand x and return the result, which can be either nounmn or error.
            :y(                                      //!< in case if i is not a verb, it must be a valid noun, and the next token after a noun should be a verb,
               e(t+1),Q(y)                           //!<   recursively evaluate next token to the right of the verb and put result into y. bail out on error.
-              58==*t                                //!<   special case: if y is preceded by a colon instead of a verb, it is an inline assignment (eg 1+a:1),
-                    ?x(g(i),Qp()ag(i-97,y))         //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in U[26], and return it.
+              ':'==*t                               //!<   special case: if y is preceded by a colon instead of a verb, it is an inline assignment (eg 1+a:1),
+                    ?x(g(i),Qp()ag(i-'a',y))        //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in U[26], and return it.
                     :x(n(i),Qp()                    //!<   x is a noun to the left of the verb. throw parse error if it is invalid.
                          u8 f=v(*t);Qd(!f)          //!<   f is the index of the verb to the left of noun y. if it's not a valid verb, throw domain error.
                          F[f](x,y))))               //!< apply dyadic verb f to nouns x and y (e.g. 2+3) and return result (noun or error).
@@ -152,13 +152,13 @@ int main(int argc,char**argv){u batch=2==argc;      //!< entry point: batch=0 is
   batch?:O("%s",BA);                                //!< system banner is only printed in interactive mode.
   while(batch?:w(32),Q!=rl(argv[1]))                //!< enter infinite read-eval-print loop until ctrl+c is pressed, error or EOF is reached.
    if(*l){                                          //!< write prompt (single space), then wait for input from stdin which is read into b.
-    $(92==*l&&!l[2],                                //!< if buffer starts with backslash and is two bytes long:
-     $(92==l[1],break)                              //!<   if buffer is a double backslash, exit repl and terminate process.
-      $(119==l[1],wu(WS))                           //!<   if buffer is a \w, print workspace usage and cycle repl.
-       $(118==l[1],wg()))                           //!<   if buffer is a \v, print globals and their refcounts (useful for debug).
+    $('\\'==*l&&!l[2],                              //!< if buffer starts with backslash and is two bytes long:
+     $('\\'==l[1],break)                            //!<   if buffer is a double backslash, exit repl and terminate process.
+      $('w'==l[1],wu(WS))                           //!<   if buffer is a \w, print workspace usage and cycle repl.
+       $('v'==l[1],wg()))                           //!<   if buffer is a \v, print globals and their refcounts (useful for debug).
         $('/'==*l,continue)                         //!< if buffer starts with /, treat the rest of the line as comment and cycle repl.
          x(e(l),                                    //!< else, evaluate buffer b[] and put result into x, then:
-           58==l[1]?x                               //!<   if b starts with a global assignment e.g. a:7, suppress output and cycle repl.
+           ':'==l[1]?x                              //!<   if b starts with a global assignment e.g. a:7, suppress output and cycle repl.
                    :_x(W(x)));}                     //!<   otherwise, pretty print evaluation result to stdout, then cycle repl.
   R free(l),fclose(t),0;}                           //!< in C, return value of main() is the exit code of the process, 0 is success.
 
