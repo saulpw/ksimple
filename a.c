@@ -39,31 +39,31 @@ f(_r,ax?x                                           //!< decrement refcount: if 
 //!monadic verbs
 f(foo,_r(x);Qz(1);Q)F(Foo,_r(x);Qz(1);Q)            //!< (foo)bar is a dummy monadic verb: for any x, throw nyi error and return error code Q.
 
-f(sub,ax?(u8)-x:_x(N(nx,-xi)))                      //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
+f(sub,ax?(u8)-x:_x(NEW(nx,-xi)))                    //!< monadic (sub)tract is also known as (neg)ation, or -x: if x is atom, return its additive inverse.
                                                     //!< if x is a vector, return a new vector same as x only with sign of its every element flipped.
 
-f(til,Qr(!ax)(N(x,i)))                              //!< monadic til is !x aka her majesty apl iota. for a given atom x, it returns a vector
+f(til,Qr(!ax)(NEW(x,i)))                            //!< monadic til is !x aka her majesty apl iota. for a given atom x, it returns a vector
                                                     //!< of x integers from 0 to x-1. if x is not an atom, til throws a rank error.
 
 f(cnt,Qr(ax)nx)                                     //!< monadic (c)ou(nt) is #x. it returns the length of a given vector and throws rank error for atoms.
 
-f(cat,Qr(!ax)N(1,x))                                //!< monadic (cat)enate is (enl)ist, or comma-x: wraps a given atom x into a new vector of length 1 whose
+f(cat,Qr(!ax)NEW(1,x))                              //!< monadic (cat)enate is (enl)ist, or comma-x: wraps a given atom x into a new vector of length 1 whose
                                                     //!< only item holds the value of that atom. if x is a vector, enlist will throw a rank error.
 
-f(rev,Qr(ax)_x(N(nx,sx[nx-i-1])))                   //!< monadic (rev)erse is |x and simply returns a mirror copy of vector x.
+f(rev,Qr(ax)_x(NEW(nx,sx[nx-i-1])))                 //!< monadic (rev)erse is |x and simply returns a mirror copy of vector x.
 
 //!dyadic verbs
 F(Add,                                              //!< dyadic f+y is add. operands can be both atoms and verbs, ie. a+a, a+v, v+a, v+v are all valid.
   ax?af?(u8)(f+x)                                   //!< case a+a: if (f,x) are atoms, compute their sum and handle possible overflows by downcasting it to u8.
        :Add(x,f)                                    //!< case v+a: if f is a vector and x is an atom, make a recursive call with operands swapped, i.e. a+v.
-    :af?_x(N(nx,f+xi))                              //!< case a+v: if f is an atom, return a new vector constructed by adding f to every element of x.
+    :af?_x(NEW(nx,f+xi))                            //!< case a+v: if f is an atom, return a new vector constructed by adding f to every element of x.
        :nx-nf?(_x(_f(Ql())))                        //!< case v+v: if (f,x) are vectors, first make sure they are of the same length, throw length error if not.
-             :_f(_x(N(nx,xi+fi))))                  //!<           if lengths are the same, return a new vector holding their pairwise sum.
+             :_f(_x(NEW(nx,xi+fi))))                //!<           if lengths are the same, return a new vector holding their pairwise sum.
                                                     //!< \note by convention, atwc uses x-y for inequality test, which has the same effect as nx!=nf.
 
 F(Sub,Add(f,sub(x)))                                //!< dyadic f-x is subtract. since we already have Add() and sub(), we get Sub() for free by negating x.
-F(Mod,Qr(!f||!af)ax?x%f:_x(N(nx,xi%f)))             //!< dyadic f!x is x (mod)ulo f, aka remainder operation. f must be an non-zero atom, x can be anything.
-F(Tak,Qr(!af)_f(N(f,ax?x:sx[i%nx])))                //!< dyadic f#x is (tak)e, which has two variants based on the type of right operand (left must be atom):
+F(Mod,Qr(!f||!af)ax?x%f:_x(NEW(nx,xi%f)))           //!< dyadic f!x is x (mod)ulo f, aka remainder operation. f must be an non-zero atom, x can be anything.
+F(Tak,Qr(!af)_f(NEW(f,ax?x:sx[i%nx])))              //!< dyadic f#x is (tak)e, which has two variants based on the type of right operand (left must be atom):
                                                     //!<  if x is a vector, return first f items of x. if f exceeds the size of x, wrap around from the start.
                                                     //!<  if x is an atom, return a vector of length f filled with x.
 
@@ -76,7 +76,7 @@ F(Cat,                                              //!< dyadic f,x is (cat)enat
 
 F(At,Qr(af)                                         //!< dyadic f@x is "needle at x in the haystack f" and has two modes based on the type of x (f must be a vector):
   ax?x>nf?Ql():sf[x]                                //!<  if x is an atom, return the x'th item of f.
-    :_x(_f(N(nx,sf[xi]))))                          //!<  if x is a vector, return a vector containg items from f at indices listed in x.
+    :_x(_f(NEW(nx,sf[xi]))))                        //!<  if x is a vector, return a vector containg items from f at indices listed in x.
                                                     //!< \note that the second mode currently doesn't perform the boundary check, fell free to implement it!
 
 f(at,At(x,0))                                       //!< monadic @x is simply (f)ir(st): return the head element of x, or throw a rank error if x is an atom.
@@ -95,7 +95,7 @@ f(at,At(x,0))                                       //!< monadic @x is simply (f
 //!     5.2 (i'th element of x) OP (i'th element of f)
 //!  6. finally, attempt to release memory of f and x, and return r.
 
-#define op(fn,OP) F(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(N(nx,f OP xi)):_f(_x(nx-nf?Ql():N(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
+#define op(fn,OP) F(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(NEW(nx,f OP xi)):_f(_x(nx-nf?Ql():NEW(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
 op(Eql,==)op(Not,!=)op(And,&)op(Or,|)op(Prd,*)                //!< et voila, we have definitions of dyadic equal, not equal, and, or and product for free.
 
 //!verb dispatch

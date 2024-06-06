@@ -80,13 +80,13 @@ static const u Q=128;                                    //!< magic numer for er
 #define Ql()    Qe("length")                             //!< length error
 
 //!all of the above coming together:
-#define N(n,e) r(alloc(n),FOR(n,ri=e))                   //!< this macro is the foundation of k/simple and is ubiquitous in a.c. it reads:
+#define NEW(n,e) r(alloc(n),FOR(n,ri=e))                 //!< this macro is the foundation of k/simple and is ubiquitous in a.c. it reads:
                                                          //!< (a)llocate a (N)ew vector r of le(n)gth n, then apply some (e)xpression to it, then return r.
                                                          //!< here are few basic examples to illustrate what "apply" means:
 
-                                                         //!< u x=N(8,2*i);        //!< x is (0,2,4,6,8,10,12,14)
-                                                         //!< u f=N(8,pow(2,i));   //!< f is (1,2,4,8,16,32,64,128,256)
-                                                         //!< u y=N(8,xi==fi);     //!< y is (0,1,1,0,0,0,0,0)
+                                                         //!< u x=NEW(8,2*i);        //!< x is (0,2,4,6,8,10,12,14)
+                                                         //!< u f=NEW(8,pow(2,i));   //!< f is (1,2,4,8,16,32,64,128,256)
+                                                         //!< u y=NEW(8,xi==fi);     //!< y is (0,1,1,0,0,0,0,0)
 
 #define _f(e) r(e,_r(f))                                 //!< execute some (e)xpression, then decrement refcount of f, potentially releasing it, and (r)eturn f.
 #define _x(e) r(e,_r(x))                                 //!< ..same for x.
