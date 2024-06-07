@@ -96,7 +96,13 @@ def1(at,At(x,0))                                    //!< monadic @x is simply (f
 //!     5.2 (i'th element of x) OP (i'th element of f)
 //!  6. finally, attempt to release memory of f and x, and return r.
 
-#define defop(fn,OP) def2(fn,ax?af?(u8)(f OP x):fn(x,f):af?_x(NEW(nx,f OP xi)):_f(_x(nx-nf?Ql():NEW(nx,sx[i] OP sf[i])))) //!< above pseudocode expressed as a C macro.
+#define defop(fn,OP)  u fn(u f, u x) { \
+    if (ax && af) return (u8)(f OP x); \
+    if (!ax && af) return fn(x,f); \
+    if (nx != nf) return Ql(); \
+    return _f(_x(NEW(nx, sx[i] OP sf[i]))); \
+}
+
 defop(Eql,==)
 defop(Not,!=)
 defop(And,&)
