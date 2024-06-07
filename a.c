@@ -118,15 +118,15 @@ char*adverbs=" /\\";
 u(*adverbs2[])(u,u)={0,Ovr,Scn};                    //!< adverbs[]/adverbs2[] is the same as verbs[]/verbs2[], only for adverbs.
 
 //!globals, verbs, nouns, adverbs
-def1(global,x>='a'&&x<='z')                         //!< is x a valid (g)lobal variable identifier?
-def2(ag,y(globals[f],!ay?unalloc(y):x;incref(globals[f]=x)))    //!< (a)ssign (g)lobal: release no longer referenced global object at globals[f], and replace it with object x.
-def1(verb,(strchr(verbs,x)?:verbs)-verbs)           //!< is x a valid verb from verbs? if so, return its index, otherwise return 0.
+def1(isglobal,x>='a'&&x<='z')                       //!< is x a valid (g)lobal variable identifier?
+def1(getglobal, globals[x])
+def2(setglobal,y(globals[f],!ay?unalloc(y):x;incref(globals[f]=x)))    //!< release no longer referenced global object at globals[f], and replace it with object x.
                                                     //!< \note rarely seen ternary form x?:y, which is just a shortcut for x?x:y in c.
+def1(verb,(strchr(verbs,x)?:verbs)-verbs)           //!< is x a valid verb from verbs? if so, return its index, otherwise return 0.
 def1(adverb,(strchr(adverbs,x)?:adverbs)-adverbs)   //!< same as verb() for adverbs.
-def1(noun,10>x-'0'                                  //!< is x a (n)oun? valid nouns are digits 0..9 and lowercase varnames a..z.
-           ?x-'0'                                   //!< if x is a digit, e.g. '7', return its decimal value.
-           :global(x)?incref(globals[x-'a'])        //!< if x is a varname, e.g. 'a', return its value from globals[26] and increment its refcount.
-                :ERR)                               //!< ..anything else is an error.
+def1(noun,10>x-'0' ? x-'0'                          //!< is x a (n)oun?  if x is a digit, e.g. '7', return its decimal value.
+        : isglobal(x) ? incref(getglobal(x-'a'))    //!< if x is a varname, e.g. 'a', return its value from globals[26] and increment its refcount.
+        : ERR)                                      //!< ..anything else is an error.
 
 //!fio
 static char*line;
@@ -150,7 +150,7 @@ defstr(eval,                                        //!< (e)val: recursively eva
            :y(                                      //!< in case if i is not a verb, it must be a valid noun, and the next token after a noun should be a verb,
               eval(t+1),Q(y)                        //!<   recursively evaluate next token to the right of the verb and put result into y. bail out on error.
               ':'==*t                               //!<   special case: if y is preceded by a colon instead of a verb, it is an inline assignment (eg 1+a:1),
-                    ?x(global(i),Qp()ag(i-'a',y))   //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in globals[26], and return it.
+                    ?x(isglobal(i),Qp()setglobal(i-'a',y)) //!<   so i should be a (g)lobal varname a..z. if so, increment y's refcount, store it in globals[26], and return it.
                     :x(noun(i),Qp()                 //!<   x is a noun to the left of the verb. throw parse error if it is invalid.
                          u8 f=verb(*t);Qd(!f)       //!<   f is the index of the verb to the left of noun y. if it's not a valid verb, throw domain error.
                          verbs2[f](x,y))))          //!< apply dyadic verb f to nouns x and y (e.g. 2+3) and return result (noun or error).
